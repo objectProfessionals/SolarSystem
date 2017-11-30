@@ -1,5 +1,6 @@
 package com.op.solar;
 
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -26,9 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TreeMap;
+import java.util.*;
 
 import javax.imageio.ImageIO;
 
@@ -38,12 +37,14 @@ public class Solar extends Base {
 	 * Small - 16 x 12 in (406 x 304 mm) Large - 20 x 16 in (508 x 406 mm) Extra
 	 * Large - 40 x 30 in (1016 x 762 mm)
 	 */
-	private double wmm_S = 406;// 0
+	private double wmm_S = 406;// 0 16x 12
 	private double hmm_S = 304;
-	private double wmm_L = 508;// 1
+	private double wmm_L = 508;// 1 20 x 16
 	private double hmm_L = 406;
-	private double wmm_XL = 1016;// 2
+	private double wmm_XL = 1016;// 2 40 x 30
 	private double hmm_XL = 762;
+	private double wmm_D = 406;// 0
+	private double hmm_D = 304;
 	private double wmm_GREETING = 210;// 3// 148;
 	private double hmm_GREETNG = 148;// 105;
 	private double wmm_POST = 210 * 2;// 4
@@ -54,7 +55,7 @@ public class Solar extends Base {
 	private double hmm_4K = 2160;
 	private double wmm_MUG = 420; // 7// 210
 	private double hmm_MUG = 172; // 86
-	private double[][] sizeArray = { { wmm_S, hmm_S }, { wmm_L, hmm_L }, { wmm_XL, hmm_XL },
+	private double[][] sizeArray = { { wmm_S, hmm_S }, { wmm_L, hmm_L }, { wmm_XL, hmm_XL },{ wmm_D, hmm_D },
 			{ wmm_GREETING, hmm_GREETNG }, { wmm_POST, hmm_POST }, { wmm_HD, hmm_HD }, { wmm_4K, hmm_4K },
 			{ wmm_MUG, hmm_MUG } };
 
@@ -68,13 +69,14 @@ public class Solar extends Base {
 	private String OBJ_S = "S";
 	private String OBJ_L = "L";
 	private String OBJ_XL = "X";
+	private String OBJ_D = "D";
 	private String OBJ_GREETING = "G";
 	private String OBJ_POST = "P";
 	private String OBJ_HD = "H";
 	private String OBJ_4K = "K";
 	private String OBJ_MUG = "M";
-	private String[] objects = { OBJ_S, OBJ_L, OBJ_XL, OBJ_GREETING, OBJ_POST, OBJ_HD, OBJ_4K, OBJ_MUG };
-	private double[] zooms = { wmm_S / wmm_L, 1.05, wmm_XL / wmm_L, wmm_GREETING / wmm_L, wmm_POST / wmm_L, 0.3, 0.6,
+	private String[] objects = { OBJ_S, OBJ_L, OBJ_XL, OBJ_D, OBJ_GREETING, OBJ_POST, OBJ_HD, OBJ_4K, OBJ_MUG };
+	private double[] zooms = { wmm_S / wmm_L, 1.05, wmm_XL / wmm_L, wmm_S / wmm_L, wmm_GREETING / wmm_L, wmm_POST / wmm_L, 0.3, 0.6,
 			0.5 };
 
 	private String dawn = "D";
@@ -196,12 +198,41 @@ public class Solar extends Base {
 	private Date dateEnd = null;
 
 	public static void main(String[] args) throws IOException, ParseException, FontFormatException {
-		solar = new Solar("MM", "1980-09-21", "", "S", "W", "forWeb/");
+		//solar = new Solar("21", "1995-06-27", "", "P", "M", "LGA/");
+		solar = new Solar("LGA_02_Sep_2001_L_M", "LGA/");
 		solar.drawSolar();
 	}
 
 	public Solar() {
 
+	}
+
+	public Solar(String all, String path) {
+		StringTokenizer data = new StringTokenizer(all, "_");
+		prefix = (String) data.nextElement();
+		String day = (String) data.nextElement();
+		String month = (String) data.nextElement();
+		String year = (String) data.nextElement();
+		String size = (String) data.nextElement();
+		String style = (String) data.nextElement();
+		HashMap<String, String> months = new HashMap();
+		months.put("Jan", "01");
+		months.put("Feb", "02");
+		months.put("Mar", "03");
+		months.put("Apr", "04");
+		months.put("May", "05");
+		months.put("Jun", "06");
+		months.put("Jul", "07");
+		months.put("Aug", "08");
+		months.put("Sep", "09");
+		months.put("Oct", "10");
+		months.put("Nov", "11");
+		months.put("Dec", "12");
+		this.endDateString = year+"-"+months.get(month)+"-"+day;
+		this.endTime = "";
+		this.selectedObject = indexOf(objects, size);
+		this.selectedStyle = indexOf(styles, style);
+		dir = "misc/solar/" + path;
 	}
 
 	public Solar(String prefix, String date, String time, String size, String style, String path) {
